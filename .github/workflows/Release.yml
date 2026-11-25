@@ -44,7 +44,7 @@ jobs:
         uses: changesets/action@v2.1.2
         with:
           version-script: npm run version-packages
-          publish-script: ${{ vars.NPM_TRUSTED_PUBLISHING == 'true' && 'npm run release' || '' }}
+          publish-script: npm run release
           commit-message: "chore: release"
           pr-title: "chore: release"
         env:
