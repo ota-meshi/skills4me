@@ -1,0 +1,49 @@
+{
+  "name": "skills4me",
+  "version": "0.0.0",
+  "description": "Use skills from local Git checkouts in Claude Code and Codex.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ota-meshi/skills4me.git"
+  },
+  "type": "module",
+  "bin": {
+    "skills4me": "./dist/skills4me.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown src/skills4me.ts --target node22",
+    "lint": "eslint .",
+    "typecheck": "tsc",
+    "test": "node --test",
+    "prepack": "npm run build",
+    "version-packages": "changeset version && npm install --package-lock-only --ignore-scripts",
+    "release": "changeset publish"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.9.0",
+    "gunshi": "0.37.3"
+  },
+  "devDependencies": {
+    "@changesets/cli": "3.0.3",
+    "@eslint-community/eslint-plugin-eslint-comments": "4.7.2",
+    "@ota-meshi/eslint-plugin": "0.21.0",
+    "@types/node": "22.20.5",
+    "eslint": "10.15.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-jsdoc": "63.3.3",
+    "eslint-plugin-n": "18.4.0",
+    "eslint-plugin-prettier": "5.5.7",
+    "eslint-plugin-regexp": "3.1.1",
+    "prettier": "3.10.1",
+    "tsdown": "0.23.7",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0"
+  }
+}
