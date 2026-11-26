@@ -1,6 +1,6 @@
 {
   "name": "skills4me",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Use skills from local Git checkouts in Claude Code, Codex, and other coding agents.",
   "license": "MIT",
   "repository": {
