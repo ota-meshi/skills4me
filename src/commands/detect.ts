@@ -1,13 +1,24 @@
 import { define } from "gunshi"
+import { agentNames } from "../agents.ts"
 import { detectSkills } from "../detection.ts"
+import { agentOption } from "./support/agent-option.ts"
 
-/** Registers `detect` without a checkout path or agent option. */
+/** Defines `detect` with an optional agent selection. */
 export const detect = define({
   name: "detect",
   description: "List skill directories eligible for adoption",
+  args: {
+    agent: {
+      ...agentOption,
+      description:
+        "Agent whose skill directories to search (repeatable; defaults to all agents)",
+    },
+  },
   /** Lists adoption candidates and reports incomplete scans. */
-  async run({ log }) {
-    const { candidates, errors } = await detectSkills()
+  async run({ log, values }) {
+    const { candidates, errors } = await detectSkills(
+      values.agent ?? agentNames,
+    )
     for (const path of candidates) {
       log(path)
     }

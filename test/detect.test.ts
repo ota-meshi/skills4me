@@ -39,8 +39,8 @@ function writeRecord(path: string, record: unknown) {
 }
 
 /** Invokes the actual CLI from its TypeScript source without a build. */
-function runDetect(cwd: string, env: NodeJS.ProcessEnv) {
-  const result = spawnSync(process.execPath, [entry, "detect"], {
+function runDetect(cwd: string, env: NodeJS.ProcessEnv, ...args: string[]) {
+  const result = spawnSync(process.execPath, [entry, "detect", ...args], {
     cwd,
     env,
     encoding: "utf8",
@@ -194,6 +194,43 @@ void test("detect applies the home project lock only to physically matching root
   assert.equal(result.status, 0, result.stderr)
   assert.equal(result.stderr, "")
   assertCandidates(result.stdout, [unrelated, unmarked])
+})
+
+void test("detect scans other agents' roots and applies the home project lock where the skills CLI installs", (t) => {
+  const { root, home, env } = createSandbox(t)
+  const kiro = join(home, ".kiro", "skills")
+  const cursor = join(home, ".cursor", "skills")
+  makeSkill(join(kiro, "project-copy"))
+  const candidates = [
+    makeSkill(join(kiro, "own-skill")),
+    makeSkill(join(cursor, "project-copy")),
+  ]
+  writeRecord(join(home, "skills-lock.json"), {
+    version: 1,
+    skills: { "project-copy": {} },
+  })
+
+  const result = runDetect(root, env)
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(result.stderr, "")
+  assertCandidates(result.stdout, candidates)
+})
+
+void test("detect searches only the agents named with --agent and keeps reservations of agents sharing their roots", (t) => {
+  const { root, home, env } = createSandbox(t)
+  const shared = join(home, ".agents", "skills")
+  const candidate = makeSkill(join(shared, "local"))
+  makeSkill(join(shared, ".system"))
+  makeSkill(join(home, ".cursor", "skills", "other"))
+  mkdirSync(join(home, ".codex"))
+  symlinkSync(shared, join(home, ".codex", "skills"), "dir")
+
+  const result = runDetect(root, env, "--agent", "cline")
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(result.stderr, "")
+  assertCandidates(result.stdout, [candidate])
 })
 
 void test("detect reports invalid or unreadable locks and prints candidates only from unaffected roots", (t) => {

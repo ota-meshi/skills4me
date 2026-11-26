@@ -144,6 +144,38 @@ void test("links to both detected installations", (t) => {
   assertDirectLink(codexLink, original)
 })
 
+void test("links for other detected agents in their own and shared skill roots", (t) => {
+  const { root, home, env } = createSandbox(t)
+  const checkout = join(root, "checkout")
+  const configHome = join(root, "xdg-config")
+  const original = makeSkill(join(checkout, "skills", "one"))
+  mkdirSync(join(checkout, ".git"))
+  mkdirSync(join(home, ".cursor"))
+  mkdirSync(join(home, ".cline"))
+  mkdirSync(join(configHome, "goose"), { recursive: true })
+
+  const result = runLink(checkout, { ...env, XDG_CONFIG_HOME: configHome })
+  assert.equal(result.status, 0, result.stderr)
+  assertDirectLink(join(home, ".cursor", "skills", "one"), original)
+  assertDirectLink(join(home, ".agents", "skills", "one"), original)
+  assertDirectLink(join(configHome, "goose", "skills", "one"), original)
+  assert.equal(existsSync(join(home, ".claude")), false)
+})
+
+void test("links only for the agents named with --agent, even if they are not detected", (t) => {
+  const { root, home, env } = createSandbox(t)
+  const checkout = join(root, "checkout")
+  const original = makeSkill(join(checkout, "skills", "one"))
+  mkdirSync(join(checkout, ".git"))
+  mkdirSync(join(home, ".claude"))
+
+  const result = runLink(checkout, env, "--agent", "cursor", "-a", "codex")
+  assert.equal(result.status, 0, result.stderr)
+  assertDirectLink(join(home, ".cursor", "skills", "one"), original)
+  assertDirectLink(join(home, ".agents", "skills", "one"), original)
+  assert.equal(existsSync(join(home, ".claude", "skills")), false)
+})
+
 void test("reuses relative links and skips the Claude reserved name", (t) => {
   const { root, home, env } = createSandbox(t)
   const checkout = join(root, "checkout")

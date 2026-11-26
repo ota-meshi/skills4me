@@ -27,6 +27,7 @@ const adoptPrompt = "Select a skill to adopt."
 
 type AdoptOptions = {
   to?: string
+  agents?: readonly string[]
   keys?: string
   interactive?: boolean
   setup?: string
@@ -55,7 +56,14 @@ function makeSkill(directory: string) {
 async function runAdopt(
   cwd: string,
   home: string,
-  { to, keys, interactive = true, setup = "", onPrompt }: AdoptOptions = {},
+  {
+    to,
+    agents = [],
+    keys,
+    interactive = true,
+    setup = "",
+    onPrompt,
+  }: AdoptOptions = {},
 ) {
   const preload = `data:text/javascript,${encodeURIComponent(`
     ${setup}
@@ -64,7 +72,10 @@ async function runAdopt(
     process.stdout.isTTY = ${interactive};
     process.stdout.columns = 240;
   `)}`
-  const argumentsForAdopt = to === undefined ? [] : ["--to", to]
+  const argumentsForAdopt = [
+    ...(to === undefined ? [] : ["--to", to]),
+    ...agents.flatMap((agent) => ["--agent", agent]),
+  ]
   const child = spawn(
     process.execPath,
     ["--import", preload, entry, "adopt", ...argumentsForAdopt],
@@ -269,6 +280,21 @@ void test("leaves a skill with an installer record out of the adoption choices",
   assert.equal(result.stdout.includes(managed), false)
   assert.equal(lstatSync(managed).isDirectory(), true)
   assert.equal(existsSync(join(checkout, "skills", "managed")), false)
+  assert.equal(realpathSync(candidate), join(checkout, "skills", "example"))
+})
+
+void test("offers only the skills of the agents named with --agent", async (t) => {
+  const { home, checkout } = createSandbox(t)
+  const other = makeSkill(join(home, ".claude", "skills", "other"))
+  const candidate = makeSkill(join(home, ".cursor", "skills", "example"))
+
+  const result = await runAdopt(checkout, home, {
+    agents: ["cursor"],
+    keys: "\r",
+  })
+  assert.equal(result.status, 0, result.stderr)
+  assert.ok(result.stdout.includes(candidate), result.stdout)
+  assert.equal(result.stdout.includes(other), false)
   assert.equal(realpathSync(candidate), join(checkout, "skills", "example"))
 })
 

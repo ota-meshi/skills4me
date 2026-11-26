@@ -1,5 +1,6 @@
 import { homedir } from "node:os"
 import { join } from "node:path"
+import { skillsCliProjectSkillDirectories } from "../../agents.ts"
 import { realpathIfPresent } from "../../skill-files.ts"
 import { readSkillsCliLock } from "./read-lock.ts"
 
@@ -24,10 +25,9 @@ export async function readSkillsCliHomeProjectLock(
 ): Promise<HomeProjectSkillLock> {
   const home = homedir()
   // These are the project install paths used by the skills CLI from home.
-  const installPaths = [
-    join(home, ".claude", "skills"),
-    join(home, ".agents", "skills"),
-  ]
+  const installPaths = skillsCliProjectSkillDirectories().map((directory) =>
+    join(home, directory),
+  )
   const agentRoots = new Set(resolvedAgentPaths.values())
   const coveredRoots = new Set<string>()
   const errors: unknown[] = []

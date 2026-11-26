@@ -2,7 +2,7 @@ import type { Stats } from "node:fs"
 import { readdir } from "node:fs/promises"
 import { basename, dirname, join } from "node:path"
 import { resolveExistingAgentSkillRoots } from "./agent-skill-roots.ts"
-import { agentNames, agentSkillPlacement } from "./agents.ts"
+import { type Agent, agentNames, agentSkillPlacement } from "./agents.ts"
 import type { InstallChecks } from "./installers/checks.ts"
 import { installCheckFactories } from "./installers/index.ts"
 import { hasRegularSkillManifest, lstatIfPresent } from "./skill-files.ts"
@@ -38,7 +38,12 @@ async function loadCandidateChecks() {
       createChecks(realPathsByConfiguredPath),
     ),
   )
-  return { reservedNamesByRoot, installerChecks, rootErrors }
+  return {
+    reservedNamesByRoot,
+    realPathsByConfiguredPath,
+    installerChecks,
+    rootErrors,
+  }
 }
 
 /** Checks whether an installer failure leaves this root's eligibility unknown. */
@@ -70,13 +75,17 @@ async function isCandidateDirectory(
   )
 }
 
-/** Finds adoption candidates and reports any checks that could not be completed. */
-export async function detectSkills(): Promise<{
+/** Finds adoption candidates in the agents' roots and reports any checks that could not be completed. */
+export async function detectSkills(agents: readonly Agent[]): Promise<{
   candidates: string[]
   errors: unknown[]
 }> {
-  const { reservedNamesByRoot, installerChecks, rootErrors } =
-    await loadCandidateChecks()
+  const {
+    reservedNamesByRoot,
+    realPathsByConfiguredPath,
+    installerChecks,
+    rootErrors,
+  } = await loadCandidateChecks()
   // A failure reading records that cover every root blocks the entire scan.
   const blockingChecks = installerChecks.filter(
     ({ deferredRoots }) => deferredRoots === "all",
@@ -93,7 +102,19 @@ export async function detectSkills(): Promise<{
     ...installerChecks.flatMap((checks) => checks.errors),
   ]
 
+  // Reservations still come from every agent because a selected root can be shared.
+  const selectedRoots = new Set(
+    agents.flatMap((agent) => {
+      const { primaryRoot, additionalRoots } = agentSkillPlacement(agent)
+      return [primaryRoot, ...additionalRoots].map(({ path }) =>
+        realPathsByConfiguredPath.get(path),
+      )
+    }),
+  )
   for (const [root, reservedNames] of reservedNamesByRoot) {
+    if (!selectedRoots.has(root)) {
+      continue
+    }
     // A scoped record failure leaves the other roots available to scan.
     if (installerChecks.some((checks) => defersRoot(checks, root))) {
       continue

@@ -1,12 +1,14 @@
 import { isCancel, select } from "@clack/prompts"
 import { define } from "gunshi"
 import { adoptSkill } from "../adoption/adopt-skill.ts"
+import { agentNames } from "../agents.ts"
 import { requireNonEmptyPath } from "../arguments.ts"
 import { findCheckout, resolveCheckoutSkillsRoot } from "../checkout.ts"
 import { detectSkills } from "../detection.ts"
+import { agentOption } from "./support/agent-option.ts"
 import { isInteractive } from "./support/terminal.ts"
 
-/** Defines `adopt` and its optional destination checkout. */
+/** Defines `adopt` with an optional destination checkout and agent selection. */
 export const adopt = define({
   name: "adopt",
   description: "Move a selected skill into a local Git checkout",
@@ -16,6 +18,11 @@ export const adopt = define({
       description:
         "Directory in the destination checkout (defaults to the current directory)",
       parse: requireNonEmptyPath,
+    },
+    agent: {
+      ...agentOption,
+      description:
+        "Agent whose skill directories to search (repeatable; defaults to all agents)",
     },
   },
   /** Offers detected skills for adoption into the resolved checkout. */
@@ -31,7 +38,9 @@ export const adopt = define({
     }
     const skillsRoot = await resolveCheckoutSkillsRoot(checkout)
 
-    const { candidates, errors } = await detectSkills()
+    const { candidates, errors } = await detectSkills(
+      values.agent ?? agentNames,
+    )
     if (candidates.length === 0) {
       if (errors.length > 0) {
         throw new AggregateError(errors)

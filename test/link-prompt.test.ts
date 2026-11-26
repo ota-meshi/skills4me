@@ -98,7 +98,7 @@ async function runCli(
   return { status, stdout, stderr }
 }
 
-void test("opens the command menu and links to detected agents after selecting a checkout", async (t) => {
+void test("opens the command menu and links to the detected agents selected by default", async (t) => {
   const { home, outside, skill } = fixture(t)
   mkdirSync(join(home, ".claude"))
   mkdirSync(join(home, ".codex"))
@@ -106,12 +106,12 @@ void test("opens the command menu and links to detected agents after selecting a
     responses: [
       { prompt: commandPrompt, keys: "\r" },
       { prompt: checkoutPrompt, keys: "/checkout/skills/example\r" },
+      { prompt: agentsPrompt, keys: "\r" },
     ],
   })
   assert.equal(result.status, 0, result.stderr)
   const menuCommands = result.stdout.match(/\b(?:link|detect|adopt)\b/gu)
   assert.deepEqual(menuCommands?.slice(0, 3), ["link", "detect", "adopt"])
-  assert.equal(result.stdout.includes(agentsPrompt), false)
   assert.equal(realpathSync(join(home, ".claude", "skills", "example")), skill)
   assert.equal(realpathSync(join(home, ".agents", "skills", "example")), skill)
 })
@@ -171,15 +171,52 @@ void test("rejects an explicit invalid checkout and requires two terminal stream
   assert.equal(noCheckout.stdout.includes(checkoutPrompt), false)
 })
 
-void test("fails without detected agents in interactive and noninteractive sessions", async (t) => {
+void test("links to the agents selected in the prompt, including undetected ones", async (t) => {
+  const { home, checkout, skill } = fixture(t)
+  mkdirSync(join(home, ".claude"))
+  const result = await runCli(checkout, home, {
+    args: ["link"],
+    responses: [{ prompt: agentsPrompt, keys: "cursor\t\r" }],
+  })
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(realpathSync(join(home, ".claude", "skills", "example")), skill)
+  assert.equal(realpathSync(join(home, ".cursor", "skills", "example")), skill)
+  assert.equal(existsSync(join(home, ".agents")), false)
+})
+
+void test("Ctrl+C at the agent prompt exits successfully without placing links", async (t) => {
   const { home, checkout } = fixture(t)
-  for (const tty of ["both", "neither"] as const) {
-    const result = await runCli(checkout, home, { args: ["link"], tty })
-    assert.equal(result.status, 1, result.stdout || result.stderr)
-    assert.match(result.stderr, /No supported agent detected\./u)
-    assert.doesNotMatch(result.stderr, /--agent/u)
-    assert.equal(result.stdout.includes(agentsPrompt), false)
-    assert.equal(existsSync(join(home, ".claude")), false)
-    assert.equal(existsSync(join(home, ".agents")), false)
-  }
+  mkdirSync(join(home, ".claude"))
+  const result = await runCli(checkout, home, {
+    args: ["link"],
+    responses: [{ prompt: agentsPrompt, keys: cancelKeys }],
+  })
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(existsSync(join(home, ".claude", "skills")), false)
+})
+
+void test("does not ask for agents named with --agent", async (t) => {
+  const { home, checkout, skill } = fixture(t)
+  const result = await runCli(checkout, home, {
+    args: ["link", "--agent", "cursor"],
+  })
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(result.stdout.includes(agentsPrompt), false)
+  assert.equal(realpathSync(join(home, ".cursor", "skills", "example")), skill)
+})
+
+void test("fails without detected agents only when it cannot ask", async (t) => {
+  const { home, checkout } = fixture(t)
+  const result = await runCli(checkout, home, {
+    args: ["link"],
+    tty: "neither",
+  })
+  assert.equal(result.status, 1, result.stdout || result.stderr)
+  assert.match(
+    result.stderr,
+    /No supported agent detected\. Name agents with --agent\./u,
+  )
+  assert.equal(result.stdout.includes(agentsPrompt), false)
+  assert.equal(existsSync(join(home, ".claude")), false)
+  assert.equal(existsSync(join(home, ".agents")), false)
 })

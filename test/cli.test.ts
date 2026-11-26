@@ -36,8 +36,13 @@ void test("rejects --skills-dir for link and adopt", () => {
   }
 })
 
-void test("rejects --agent for link", () => {
-  expectRejection(["link", "--agent", "claude"], /Unknown option: --agent/u)
+void test("rejects agent names that the skills CLI does not use", () => {
+  for (const command of ["link", "detect", "adopt"]) {
+    expectRejection(
+      [command, "--agent", "claude"],
+      /Optional argument '--agent' or '-a' should be chosen from 'enum'/u,
+    )
+  }
 })
 
 void test("rejects positionals Gunshi does not consume", () => {
