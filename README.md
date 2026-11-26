@@ -2,15 +2,15 @@
 
 [日本語](README.ja.md)
 
-A CLI for using skills from local Git checkouts in Claude Code, Codex, Cursor, Gemini CLI, and other coding agents. It can also bring unmanaged skills into a checkout you choose.
+A CLI for managing user-level Agent Skills across projects in Claude Code, Codex, Cursor, Gemini CLI, and other coding agents.
 
 Requires Node.js 22 or later.
-
-It supports the agents that have a user-level skill directory in the [`skills` CLI](https://github.com/vercel-labs/skills), except Replit, and uses the same directories.
 
 Run `npx skills4me` in an interactive terminal to open the command menu.
 
 ## Link skills from a checkout
+
+You can use separate Git checkouts for personal and work skills without registering them or setting up a central library.
 
 Put each skill in `skills/<name>/` with its `SKILL.md` and any supporting files. A checkout with a single skill can use `skills/SKILL.md` directly. Run this from the checkout.
 
@@ -18,15 +18,15 @@ Put each skill in `skills/<name>/` with its `SKILL.md` and any supporting files.
 npx skills4me link
 ```
 
-The command links each skill for the agents you select. In an interactive terminal, it lists every supported agent with the detected ones already selected; otherwise, it uses all detected agents. Run it in each checkout you want to use, and rerun it after adding, renaming, or removing skills. Edits through the links update the files in your checkout. Existing same-name skills are kept, and conflicts are reported.
+The command links each skill into the selected agents' user-level skill directories. In an interactive terminal, it lists every supported agent and preselects the detected ones. In a noninteractive run, it uses all detected agents. Run it in each checkout you want to use, and rerun it after adding, renaming, or removing skills. Edits through the links update the files in your checkout. Existing same-name skills are kept, and conflicts are reported.
 
-To select agents without the prompt, name each one with `--agent`, as in `npx skills4me link --agent claude-code --agent cursor`. Named agents get links even if they are not detected. Agent names are the same as in the `skills` CLI.
+To skip the agent prompt, use `npx skills4me link --agent claude-code --agent cursor`. You can name agents that were not detected. Run `npx skills4me link --help` for the list of names you can pass to `--agent`.
 
 Use `npx skills4me link <directory>` to specify a checkout. If you omit the path outside a checkout, an interactive terminal lets you choose one.
 
 ## Bring a skill into Git
 
-To preview candidates, run `npx skills4me detect`. The list excludes links and skills recorded by the `skills` CLI or `openskills`.
+Run `npx skills4me detect` to preview candidates. It skips links. A third-party skill without a recognized record can still appear, so review the list before choosing a skill.
 
 From the destination checkout, run the following in an interactive terminal and choose a skill.
 
