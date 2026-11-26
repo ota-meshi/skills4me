@@ -1,5 +1,13 @@
 # skills4me
 
+## 0.2.0
+
+### Minor Changes
+
+- 60efbbf: Add `--agent` to `link`, `detect`, and `adopt` to limit them to the named agents, as in `--agent claude-code --agent cursor`.
+- 60efbbf: Ask which agents to link for when `link` runs in an interactive terminal without `--agent`, with the detected agents selected.
+- 60efbbf: Add support for more coding agents, such as Cursor, Gemini CLI, GitHub Copilot, and OpenCode, in the same user skill directories that the `skills` CLI uses.
+
 ## 0.1.0
 
 ### Minor Changes
