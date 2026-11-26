@@ -2,9 +2,11 @@
 
 [English](README.md)
 
-手元の Git チェックアウトにあるスキルを Claude Code と Codex のユーザーレベルで使うための CLI です。未管理のスキルを、選んだチェックアウトに取り込むこともできます。
+手元の Git チェックアウトにあるスキルを Claude Code、Codex、Cursor、Gemini CLI などのコーディングエージェントのユーザーレベルで使うための CLI です。未管理のスキルを、選んだチェックアウトに取り込むこともできます。
 
 Node.js 22 以降が必要です。
+
+[`skills` CLI](https://github.com/vercel-labs/skills) がユーザーレベルのスキルディレクトリを持つエージェント（Replit を除く）に対応し、同じディレクトリを使います。
 
 対話端末で `npx skills4me` を実行すると、コマンドを選べます。
 

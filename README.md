@@ -2,9 +2,11 @@
 
 [日本語](README.ja.md)
 
-A CLI for using skills from local Git checkouts in Claude Code and Codex. It can also bring unmanaged skills into a checkout you choose.
+A CLI for using skills from local Git checkouts in Claude Code, Codex, Cursor, Gemini CLI, and other coding agents. It can also bring unmanaged skills into a checkout you choose.
 
 Requires Node.js 22 or later.
+
+It supports the agents that have a user-level skill directory in the [`skills` CLI](https://github.com/vercel-labs/skills), except Replit, and uses the same directories.
 
 Run `npx skills4me` in an interactive terminal to open the command menu.
 

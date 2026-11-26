@@ -196,6 +196,27 @@ void test("detect applies the home project lock only to physically matching root
   assertCandidates(result.stdout, [unrelated, unmarked])
 })
 
+void test("detect scans other agents' roots and applies the home project lock where the skills CLI installs", (t) => {
+  const { root, home, env } = createSandbox(t)
+  const kiro = join(home, ".kiro", "skills")
+  const cursor = join(home, ".cursor", "skills")
+  makeSkill(join(kiro, "project-copy"))
+  const candidates = [
+    makeSkill(join(kiro, "own-skill")),
+    makeSkill(join(cursor, "project-copy")),
+  ]
+  writeRecord(join(home, "skills-lock.json"), {
+    version: 1,
+    skills: { "project-copy": {} },
+  })
+
+  const result = runDetect(root, env)
+
+  assert.equal(result.status, 0, result.stderr)
+  assert.equal(result.stderr, "")
+  assertCandidates(result.stdout, candidates)
+})
+
 void test("detect reports invalid or unreadable locks and prints candidates only from unaffected roots", (t) => {
   const { root, home, env } = createSandbox(t)
   makeSkill(join(home, ".claude", "skills", "claude"))
