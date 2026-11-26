@@ -4,7 +4,9 @@
 
 A CLI for using skills from local Git checkouts in Claude Code and Codex. It can also bring unmanaged skills into a checkout you choose.
 
-The commands below require Node.js 22 or later and `skills4me` 0.1.0 or later. In an interactive terminal, run `npx skills4me` to choose a command.
+Requires Node.js 22 or later.
+
+Run `npx skills4me` in an interactive terminal to open the command menu.
 
 ## Link skills from a checkout
 
