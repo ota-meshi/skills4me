@@ -84,7 +84,7 @@ function createSingleRootStrategy({
  * including the ones it places in ~/.config regardless of XDG_CONFIG_HOME.
  */
 export const agentStrategies = {
-  claude: {
+  "claude-code": {
     skillsCliProjectSkillDirectory: ".claude/skills",
     /** Uses a nonblank CLAUDE_CONFIG_DIR or defaults to ~/.claude. */
     configDirectory() {
