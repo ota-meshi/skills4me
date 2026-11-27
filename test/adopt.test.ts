@@ -36,7 +36,10 @@ type AdoptOptions = {
 
 /** Isolates the user's skill roots and the target Git checkout. */
 function createSandbox(t: TestContext) {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), "skills4me-adopt-")))
+  // Match the CLI's real paths, which expand Windows short names such as RUNNER~1.
+  const root = realpathSync.native(
+    mkdtempSync(join(tmpdir(), "skills4me-adopt-")),
+  )
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const home = join(root, "home")
   const checkout = join(root, "checkout")
@@ -79,7 +82,12 @@ async function runAdopt(
   const child = spawn(
     process.execPath,
     ["--import", preload, entry, "adopt", ...argumentsForAdopt],
-    { cwd, env: { HOME: home }, timeout: 10_000 },
+    {
+      cwd,
+      // Windows reads the home directory from USERPROFILE instead of HOME.
+      env: { HOME: home, USERPROFILE: home },
+      timeout: 10_000,
+    },
   )
   const closed = once(child, "close")
   let stdout = ""
@@ -151,7 +159,8 @@ void test("adopts into the checkout selected by --to and keeps the full skill us
   chmodSync(join(sourceScripts, "run.sh"), 0o755)
   const notes = "Reference content.\n"
   writeFileSync(join(source, "references", "notes.md"), notes)
-  const relativeLink = "../references/notes.md"
+  // Windows stores symlink targets with backslashes.
+  const relativeLink = join("..", "references", "notes.md")
   symlinkSync(relativeLink, join(sourceScripts, "notes"), "file")
   chmodSync(sourceScripts, 0o555)
 
@@ -173,8 +182,13 @@ void test("adopts into the checkout selected by --to and keeps the full skill us
       "# example\n",
     )
     assert.equal(readFileSync(join(copiedScripts, "run.sh"), "utf8"), script)
-    assert.equal(statSync(join(copiedScripts, "run.sh")).mode & 0o111, 0o111)
-    assert.equal(statSync(copiedScripts).mode & 0o777, 0o555)
+    // Windows mode bits reflect only the read-only attribute.
+    if (process.platform === "win32") {
+      assert.equal(statSync(copiedScripts).mode & 0o222, 0)
+    } else {
+      assert.equal(statSync(join(copiedScripts, "run.sh")).mode & 0o111, 0o111)
+      assert.equal(statSync(copiedScripts).mode & 0o777, 0o555)
+    }
     assert.equal(readlinkSync(join(copiedScripts, "notes")), relativeLink)
     assert.equal(readFileSync(join(sourceScripts, "notes"), "utf8"), notes)
     assert.equal(existsSync(dirname(backup)), false)
