@@ -44,8 +44,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
         node: [22.x, 24.x]
+        include:
+          - os: windows-latest
+            node: 24.x
+          - os: macos-latest
+            node: 24.x
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
