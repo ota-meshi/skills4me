@@ -171,16 +171,22 @@ void test("rejects an explicit invalid checkout and requires two terminal stream
   assert.equal(noCheckout.stdout.includes(checkoutPrompt), false)
 })
 
-void test("links to the agents selected in the prompt, including undetected ones", async (t) => {
+void test("offers only the detected agents and links to the ones kept selected", async (t) => {
   const { home, checkout, skill } = fixture(t)
   mkdirSync(join(home, ".claude"))
+  mkdirSync(join(home, ".cursor"))
   const result = await runCli(checkout, home, {
     args: ["link"],
     responses: [{ prompt: agentsPrompt, keys: "cursor\t\r" }],
   })
   assert.equal(result.status, 0, result.stderr)
+  // The first rendering lists all options; Clack adds the hint to the focused one.
+  const firstOptions = result.stdout
+    .split("Search: _\n")[1]
+    ?.split("\n│  ↑/↓")[0]
+  assert.equal(firstOptions, "│  ◼ Claude Code\n│  ◼ Cursor (cursor)")
   assert.equal(realpathSync(join(home, ".claude", "skills", "example")), skill)
-  assert.equal(realpathSync(join(home, ".cursor", "skills", "example")), skill)
+  assert.equal(existsSync(join(home, ".cursor", "skills")), false)
   assert.equal(existsSync(join(home, ".agents")), false)
 })
 
@@ -205,18 +211,17 @@ void test("does not ask for agents named with --agent", async (t) => {
   assert.equal(realpathSync(join(home, ".cursor", "skills", "example")), skill)
 })
 
-void test("fails without detected agents only when it cannot ask", async (t) => {
+void test("fails without detected agents instead of asking", async (t) => {
   const { home, checkout } = fixture(t)
-  const result = await runCli(checkout, home, {
-    args: ["link"],
-    tty: "neither",
-  })
-  assert.equal(result.status, 1, result.stdout || result.stderr)
-  assert.match(
-    result.stderr,
-    /No supported agent detected\. Name agents with --agent\./u,
-  )
-  assert.equal(result.stdout.includes(agentsPrompt), false)
-  assert.equal(existsSync(join(home, ".claude")), false)
-  assert.equal(existsSync(join(home, ".agents")), false)
+  for (const tty of ["both", "neither"] as const) {
+    const result = await runCli(checkout, home, { args: ["link"], tty })
+    assert.equal(result.status, 1, result.stdout || result.stderr)
+    assert.match(
+      result.stderr,
+      /No supported agent detected\. Name agents with --agent\./u,
+    )
+    assert.equal(result.stdout.includes(agentsPrompt), false)
+    assert.equal(existsSync(join(home, ".claude")), false)
+    assert.equal(existsSync(join(home, ".agents")), false)
+  }
 })
