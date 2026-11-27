@@ -9,6 +9,8 @@
 
 skills4me は、Git チェックアウト内のスキルを、Claude Code、Codex、Cursor、Gemini CLI ほか 70 以上のコーディングエージェントのユーザーレベルのスキルディレクトリにリンクします。
 
+![`npx skills4me link` で、~/my-skills と ~/work-skills のスキルを Claude Code、Codex、Cursor、Gemini CLI、GitHub Copilot ほか 70 のエージェントのスキルディレクトリにリンクする図](docs/images/how-it-works.svg)
+
 - **その場で編集できる。** エージェントはリンク経由でチェックアウトを読むため、編集は入れ直さずに反映されます。
 - **一つのコマンドで全エージェントに。** `link` で、選んだすべてのエージェントにスキルを配置します。
 - **準備がいらない。** 設定ファイルも事前登録も中央管理用のディレクトリも不要です。個人用と仕事用のスキルを別々のチェックアウトに分けられます。

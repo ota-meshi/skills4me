@@ -9,6 +9,8 @@
 
 skills4me links the skills in your Git checkouts into the user-level skill directories of Claude Code, Codex, Cursor, Gemini CLI, and 70+ other coding agents.
 
+![`npx skills4me link` links the skills in ~/my-skills and ~/work-skills into the skill directories of Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, and 70 more agents.](docs/images/how-it-works.svg)
+
 - **Edit in place.** Agents read your checkout through links, so edits apply without reinstalling.
 - **One command for every agent.** `link` places each skill for all the agents you choose.
 - **No setup.** No config file, registry, or central library. Keep personal and work skills in separate checkouts.
