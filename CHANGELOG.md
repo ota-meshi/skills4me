@@ -1,5 +1,11 @@
 # skills4me
 
+## 0.2.1
+
+### Patch Changes
+
+- 3b35d02: Rewrite the README with a diagram of how `link` works, a quick start with example output, and a comparison with other skill installers.
+
 ## 0.2.0
 
 ### Minor Changes
