@@ -48,9 +48,9 @@ jobs:
         node: [22.x, 24.x]
         include:
           - os: windows-latest
-            node: 24.x
+            node: lts/*
           - os: macos-latest
-            node: 24.x
+            node: lts/*
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0
