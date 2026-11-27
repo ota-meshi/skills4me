@@ -18,11 +18,15 @@ const entry = fileURLToPath(new URL("../src/skills4me.ts", import.meta.url))
 
 /** Isolates the scanned paths from the host's agent configuration. */
 function createSandbox(t: TestContext) {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), "skills4me-detect-")))
+  // Match the CLI's real paths, which expand Windows short names such as RUNNER~1.
+  const root = realpathSync.native(
+    mkdtempSync(join(tmpdir(), "skills4me-detect-")),
+  )
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const home = join(root, "home")
   mkdirSync(home)
-  return { root, home, env: { HOME: home } }
+  // Windows reads the home directory from USERPROFILE instead of HOME.
+  return { root, home, env: { HOME: home, USERPROFILE: home } }
 }
 
 /** Creates a real skill directory with a regular manifest. */
@@ -77,7 +81,7 @@ void test("detect still reports readable roots when an agent root cannot be reso
   const result = runDetect(root, { ...env, CLAUDE_CONFIG_DIR: config })
 
   assert.equal(result.status, 1)
-  assert.match(result.stderr, /\.codex\/skills/u)
+  assert.match(result.stderr, /\.codex[/\\]skills/u)
   assertCandidates(result.stdout, [candidate])
 })
 

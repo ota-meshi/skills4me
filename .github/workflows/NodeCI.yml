@@ -39,12 +39,18 @@ jobs:
         run: npm run typecheck
 
   test:
-    name: Test on Node.js ${{ matrix.node }}
-    runs-on: ubuntu-latest
+    name: Test on Node.js ${{ matrix.node }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest]
         node: [22.x, 24.x]
+        include:
+          - os: windows-latest
+            node: lts/*
+          - os: macos-latest
+            node: lts/*
     steps:
       - uses: actions/checkout@v7.0.1
       - uses: actions/setup-node@v7.1.0

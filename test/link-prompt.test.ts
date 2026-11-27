@@ -10,7 +10,7 @@ import {
   writeFileSync,
 } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { join, sep } from "node:path"
 import { test, type TestContext } from "node:test"
 import { fileURLToPath } from "node:url"
 import { stripVTControlCharacters } from "node:util"
@@ -30,7 +30,10 @@ type RunOptions = {
 
 /** Prepares a checkout below a working directory outside Git. */
 function fixture(t: TestContext) {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), "skills4me-prompt-")))
+  // Match the CLI's real paths, which expand Windows short names such as RUNNER~1.
+  const root = realpathSync.native(
+    mkdtempSync(join(tmpdir(), "skills4me-prompt-")),
+  )
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const home = join(root, "home")
   const outside = join(root, "outside")
@@ -64,7 +67,9 @@ async function runCli(
   const preload = `data:text/javascript,${encodeURIComponent(setup)}`
   const child = spawn(process.execPath, ["--import", preload, entry, ...args], {
     cwd,
-    env: { HOME: home },
+    // Windows reads the home directory from USERPROFILE instead of HOME.
+    // Clack draws Unicode symbols on Windows only in terminals it recognizes.
+    env: { HOME: home, USERPROFILE: home, WT_SESSION: "skills4me-test" },
     timeout: 10_000,
   })
   const closed = once(child, "close")
@@ -105,7 +110,11 @@ void test("opens the command menu and links to the detected agents selected by d
   const result = await runCli(outside, home, {
     responses: [
       { prompt: commandPrompt, keys: "\r" },
-      { prompt: checkoutPrompt, keys: "/checkout/skills/example\r" },
+      // Clack matches typed paths as text, so type the platform separator.
+      {
+        prompt: checkoutPrompt,
+        keys: `${sep}${join("checkout", "skills", "example")}\r`,
+      },
       { prompt: agentsPrompt, keys: "\r" },
     ],
   })

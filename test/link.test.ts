@@ -22,11 +22,15 @@ const entry = fileURLToPath(new URL("../src/skills4me.ts", import.meta.url))
 
 /** Isolates user configuration and placements in a temporary home. */
 function createSandbox(t: TestContext) {
-  const root = realpathSync(mkdtempSync(join(tmpdir(), "skills4me-link-")))
+  // Match the CLI's real paths, which expand Windows short names such as RUNNER~1.
+  const root = realpathSync.native(
+    mkdtempSync(join(tmpdir(), "skills4me-link-")),
+  )
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const home = join(root, "home")
   mkdirSync(home)
-  return { root, home, env: { HOME: home } }
+  // Windows reads the home directory from USERPROFILE instead of HOME.
+  return { root, home, env: { HOME: home, USERPROFILE: home } }
 }
 
 /** Creates an ordinary skill directory with a readable original. */

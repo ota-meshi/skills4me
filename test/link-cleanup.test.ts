@@ -13,7 +13,7 @@ import {
   writeFileSync,
 } from "node:fs"
 import { tmpdir } from "node:os"
-import { basename, join, relative } from "node:path"
+import { basename, join, relative, resolve } from "node:path"
 import { test, type TestContext } from "node:test"
 import { fileURLToPath } from "node:url"
 
@@ -21,14 +21,16 @@ const entry = fileURLToPath(new URL("../src/skills4me.ts", import.meta.url))
 
 /** Isolates the CLI's user-level placements in a disposable home. */
 function createSandbox(t: TestContext) {
-  const root = realpathSync(
+  // Match the CLI's real paths, which expand Windows short names such as RUNNER~1.
+  const root = realpathSync.native(
     mkdtempSync(join(tmpdir(), "skills4me-link-cleanup-test-")),
   )
   t.after(() => rmSync(root, { recursive: true, force: true }))
   const home = join(root, "home")
   mkdirSync(join(home, ".claude"), { recursive: true })
   mkdirSync(join(home, ".codex"))
-  return { root, home, env: { HOME: home } }
+  // Windows reads the home directory from USERPROFILE instead of HOME.
+  return { root, home, env: { HOME: home, USERPROFILE: home } }
 }
 
 /** Creates a checkout marker without invoking Git. */
@@ -94,7 +96,8 @@ void test("rerunning link cleans renamed and incomplete skills and leaves anothe
     assert.equal(realpathSync(join(placements, "added")), added)
     assert.equal(realpathSync(join(placements, "kept")), kept)
     assert.equal(realpathSync(join(placements, "renamed")), renamed)
-    assert.equal(readlinkSync(join(placements, "other")), other)
+    // Windows junction targets read back with a trailing separator.
+    assert.equal(resolve(readlinkSync(join(placements, "other"))), other)
   }
   assert.equal(existsSync(incomplete), true)
 })
@@ -132,7 +135,9 @@ void test("preserves stale placements that follow external paths or point to a s
   const removed = makeSkill(join(outside, "skills", "removed"))
   const bridge = join(checkout, "bridge")
   symlinkSync(intermediate, bridge, "dir")
-  const externalTarget = `${bridge}/../skills/removed`
+  // Windows applies ".." before following the bridge, so link outside directly.
+  const externalTarget =
+    process.platform === "win32" ? removed : `${bridge}/../skills/removed`
   const external = makeLink(placements, "external", externalTarget)
   assert.equal(realpathSync.native(external), removed)
   rmSync(removed, { recursive: true })
