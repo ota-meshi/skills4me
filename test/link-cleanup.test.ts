@@ -135,7 +135,9 @@ void test("preserves stale placements that follow external paths or point to a s
   const removed = makeSkill(join(outside, "skills", "removed"))
   const bridge = join(checkout, "bridge")
   symlinkSync(intermediate, bridge, "dir")
-  const externalTarget = `${bridge}/../skills/removed`
+  // Windows applies ".." before following the bridge, so link outside directly.
+  const externalTarget =
+    process.platform === "win32" ? removed : `${bridge}/../skills/removed`
   const external = makeLink(placements, "external", externalTarget)
   assert.equal(realpathSync.native(external), removed)
   rmSync(removed, { recursive: true })

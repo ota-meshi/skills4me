@@ -442,7 +442,11 @@ void test("reuses a competing symlink only when it resolves to the adopted skill
       const portal = join(checkout, "portal")
       symlinkSync(nested, portal, "dir")
       expectedTarget = makeSkill(join(outside, "skills", "example"))
-      target = `${portal}/../skills/example`
+      // Windows applies ".." before following the portal, so link outside directly.
+      target =
+        process.platform === "win32"
+          ? expectedTarget
+          : `${portal}/../skills/example`
     }
     const setup = replaceSourceAfterStaging(source, { target })
 

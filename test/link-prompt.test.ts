@@ -68,7 +68,8 @@ async function runCli(
   const child = spawn(process.execPath, ["--import", preload, entry, ...args], {
     cwd,
     // Windows reads the home directory from USERPROFILE instead of HOME.
-    env: { HOME: home, USERPROFILE: home },
+    // Clack draws Unicode symbols on Windows only in terminals it recognizes.
+    env: { HOME: home, USERPROFILE: home, WT_SESSION: "skills4me-test" },
     timeout: 10_000,
   })
   const closed = once(child, "close")
