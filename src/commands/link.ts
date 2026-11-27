@@ -23,7 +23,7 @@ export const link = define({
     agent: {
       ...agentOption,
       description:
-        "Agent to link skills for, even if it is not detected (repeatable; otherwise asks in a terminal or uses detected agents)",
+        "Agent to link skills for, even if it is not detected (repeatable; otherwise uses the detected agents, asking which ones in a terminal)",
     },
   },
   /** Cleans stale checkout links and links skills for the selected or detected agents. */

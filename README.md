@@ -38,7 +38,7 @@ Run this from the checkout.
 npx skills4me link
 ```
 
-Choose agents from the list, where the detected ones are preselected. Each skill is linked into their skill directories.
+Choose from the detected agents, which are all preselected. Each skill is linked into their skill directories.
 
 ```text
 Linked ~/.claude/skills/commit-message -> ~/my-skills/skills/commit-message
@@ -54,8 +54,8 @@ In an interactive terminal, run `npx skills4me` without a command to pick one fr
 ## Link skills from a checkout
 
 - Put a skill's supporting files next to its `SKILL.md`. A checkout with a single skill can use `skills/SKILL.md` directly, which creates a link named `skills`.
-- In an interactive terminal, `link` lists every supported agent. In a noninteractive run, it uses all detected agents.
-- To skip the prompt, name agents with `--agent`, as in `npx skills4me link --agent claude-code --agent cursor`. You can name agents that were not detected. `npx skills4me link --help` lists the names.
+- In an interactive terminal, `link` lists only the detected agents. In a noninteractive run, it uses all of them.
+- To skip the prompt or to link for agents that were not detected, name agents with `--agent`, as in `npx skills4me link --agent claude-code --agent cursor`. `npx skills4me link --help` lists the names.
 - Rerun `link` after adding, renaming, or removing skill directories. Links left by renamed or removed skills are removed.
 - Existing same-name skills are kept, and conflicts are reported.
 - To use several checkouts, run `link` in each. From elsewhere, use `npx skills4me link <directory>`. If you omit the path outside a checkout, an interactive terminal lets you choose one.
