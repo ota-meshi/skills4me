@@ -1,5 +1,11 @@
 # skills4me
 
+## 0.3.0
+
+### Minor Changes
+
+- 316ad8e: List only the detected agents in the `link` agent prompt. To link for an agent that was not detected, name it with `--agent`.
+
 ## 0.2.1
 
 ### Patch Changes
