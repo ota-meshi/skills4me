@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="400" viewBox="0 0 960 400" role="img" aria-labelledby="title">
+  <title id="title">skills4me links the skills in your Git checkouts into the skill directories of Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, and 70 more agents</title>
+  <style>
+    .canvas { fill: #ffffff; stroke: #d0d7de; }
+    .card { fill: #f6f8fa; stroke: #d0d7de; }
+    .more { fill: none; stroke: #d0d7de; stroke-dasharray: 5 4; }
+    .wire { fill: none; stroke: #0969da; stroke-width: 2; }
+    .dot { fill: #0969da; }
+    .pill { fill: #1f2328; }
+    .pill-text { fill: #ffffff; }
+    .text { fill: #1f2328; }
+    .muted { fill: #59636e; }
+    .accent { fill: #0969da; }
+    .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+    @media (prefers-color-scheme: dark) {
+      .canvas { fill: #0d1117; stroke: #3d444d; }
+      .card { fill: #151b23; stroke: #3d444d; }
+      .more { stroke: #3d444d; }
+      .wire { stroke: #4493f8; }
+      .dot { fill: #4493f8; }
+      .pill { fill: #2a313c; }
+      .pill-text { fill: #f0f6fc; }
+      .text { fill: #f0f6fc; }
+      .muted { fill: #9198a1; }
+      .accent { fill: #4493f8; }
+    }
+  </style>
+
+  <rect class="canvas" x="0.5" y="0.5" width="959" height="399" rx="16" />
+
+  <!-- Git checkouts -->
+  <rect class="card" x="32" y="60" width="260" height="140" rx="10" />
+  <text class="text mono" x="52" y="92" font-size="15" font-weight="600">~/my-skills</text>
+  <text class="muted sans" x="272" y="92" font-size="12" text-anchor="end">Git checkout</text>
+  <text class="muted mono" x="52" y="134" font-size="14">skills/</text>
+  <text class="text mono" x="52" y="158" font-size="14"><tspan class="muted">├─ </tspan>commit-message/</text>
+  <text class="text mono" x="52" y="182" font-size="14"><tspan class="muted">└─ </tspan>review-pr/</text>
+
+  <rect class="card" x="32" y="224" width="260" height="116" rx="10" />
+  <text class="text mono" x="52" y="256" font-size="15" font-weight="600">~/work-skills</text>
+  <text class="muted sans" x="272" y="256" font-size="12" text-anchor="end">Git checkout</text>
+  <text class="muted mono" x="52" y="290" font-size="14">skills/</text>
+  <text class="text mono" x="52" y="314" font-size="14"><tspan class="muted">└─ </tspan>release-notes/</text>
+
+  <!-- Wires from the checkouts to the command -->
+  <path class="wire" d="M292 130 C 322 130, 322 200, 352 200" />
+  <path class="wire" d="M292 282 C 322 282, 322 200, 352 200" />
+  <circle class="dot" cx="292" cy="130" r="4" />
+  <circle class="dot" cx="292" cy="282" r="4" />
+
+  <!-- Command -->
+  <rect class="pill" x="352" y="180" width="220" height="40" rx="20" />
+  <text class="pill-text mono" x="462" y="205" font-size="14" text-anchor="middle">npx skills4me link</text>
+
+  <!-- Wires from the command to the agents -->
+  <path class="wire" d="M572 200 C 602 200, 602 60, 632 60" />
+  <path class="wire" d="M572 200 C 602 200, 602 116, 632 116" />
+  <path class="wire" d="M572 200 C 602 200, 602 172, 632 172" />
+  <path class="wire" d="M572 200 C 602 200, 602 228, 632 228" />
+  <path class="wire" d="M572 200 C 602 200, 602 284, 632 284" />
+  <path class="wire" d="M572 200 C 602 200, 602 340, 632 340" stroke-dasharray="5 4" />
+
+  <!-- Agents' skill directories -->
+  <rect class="card" x="632" y="36" width="296" height="48" rx="10" />
+  <text class="text sans" x="650" y="65" font-size="14" font-weight="600">Claude Code</text>
+  <text class="accent mono" x="910" y="65" font-size="13" text-anchor="end">~/.claude/skills</text>
+
+  <rect class="card" x="632" y="92" width="296" height="48" rx="10" />
+  <text class="text sans" x="650" y="121" font-size="14" font-weight="600">Codex</text>
+  <text class="accent mono" x="910" y="121" font-size="13" text-anchor="end">~/.agents/skills</text>
+
+  <rect class="card" x="632" y="148" width="296" height="48" rx="10" />
+  <text class="text sans" x="650" y="177" font-size="14" font-weight="600">Cursor</text>
+  <text class="accent mono" x="910" y="177" font-size="13" text-anchor="end">~/.cursor/skills</text>
+
+  <rect class="card" x="632" y="204" width="296" height="48" rx="10" />
+  <text class="text sans" x="650" y="233" font-size="14" font-weight="600">Gemini CLI</text>
+  <text class="accent mono" x="910" y="233" font-size="13" text-anchor="end">~/.gemini/skills</text>
+
+  <rect class="card" x="632" y="260" width="296" height="48" rx="10" />
+  <text class="text sans" x="650" y="289" font-size="14" font-weight="600">GitHub Copilot</text>
+  <text class="accent mono" x="910" y="289" font-size="13" text-anchor="end">~/.copilot/skills</text>
+
+  <rect class="more" x="632" y="316" width="296" height="48" rx="10" />
+  <text class="muted sans" x="650" y="345" font-size="14">+ 70 more agents</text>
+</svg>
